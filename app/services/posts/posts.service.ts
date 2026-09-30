@@ -1,5 +1,7 @@
 "use server";
 
+const API_BASE_URL = process.env.INTERNAL_API_URL ?? "http://localhost:3000";
+
 export async function listPosts({
   page,
   perPage,
@@ -31,7 +33,7 @@ export async function listPosts({
   const requestTag = buildGetPosts({ page, perPage });
 
   const req = await fetch(
-    `http://localhost:3000/api/posts${queryString ? `?${queryString}` : ""}`,
+    `${API_BASE_URL}/api/posts${queryString ? `?${queryString}` : ""}`,
     {
       next: { tags: [requestTag], revalidate: 120 },
     },
@@ -46,7 +48,7 @@ export async function getPostById(id: number) {
   try {
     const { buildGetPostTag } = await import("./buildTag");
     const requestTag = buildGetPostTag(id);
-    const req = await fetch(`http://localhost:3000/api/posts/${id}`, {
+    const req = await fetch(`${API_BASE_URL}/api/posts/${id}`, {
       next: { tags: [requestTag], revalidate: 120 },
     });
 
@@ -65,12 +67,9 @@ export async function getCommentsByPostId(postId: number) {
 
     const requestTag = buildGetPostCommentsTag(postId);
 
-    const req = await fetch(
-      `http://localhost:3000/api/posts/${postId}/comments`,
-      {
-        next: { tags: [requestTag], revalidate: 120 },
-      },
-    );
+    const req = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
+      next: { tags: [requestTag], revalidate: 120 },
+    });
 
     const data: PostComment[] = await req.json();
 
